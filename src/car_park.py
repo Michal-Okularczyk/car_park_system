@@ -3,11 +3,13 @@
 class CarPark:
     pass  # Placeholder, ill add attributes and methods later
 
+# car_park.py
+
 from sensor import Sensor
 from display import Display
 
 class CarPark:
-    def __init__(self, location="Unknown", capacity=0, plates=None, sensors=None, displays=None):
+    def __init__(self, location, capacity, plates=None, sensors=None, displays=None):
         self.location = location
         self.capacity = capacity
         self.plates = plates or []
@@ -34,9 +36,14 @@ class CarPark:
             self.plates.remove(plate)
             self.update_displays()
 
+    @property
+    def available_bays(self):
+        return max(0, self.capacity - len(self.plates))
+
     def update_displays(self):
-        available_bays = self.capacity - len(self.plates)
+        data = {"available_bays": self.available_bays, "temperature": 25}  # Example data
         for display in self.displays:
-            display.update(available_bays)
+            display.update(data)
+
 
 
