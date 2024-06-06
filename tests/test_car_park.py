@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import unittest
 from car_park import CarPark
 
@@ -13,6 +15,7 @@ class TestCarPark(unittest.TestCase):
         self.assertEqual(self.car_park.sensors, [])
         self.assertEqual(self.car_park.displays, [])
         self.assertEqual(self.car_park.available_bays, 100)
+        self.assertEqual(self.car_park.log_file, Path("log.txt"))
 
     def test_add_car(self):
         self.car_park.add_car("FAKE-001")
@@ -45,6 +48,14 @@ class TestCarPark(unittest.TestCase):
         # Try to register a string object
         with self.assertRaises(TypeError):
             self.car_park.register("Not a Sensor or Display")
+
+def test_log_file_created(self):
+    new_carpark = CarPark("123 Example Street", 100, log_file="new_log.txt")
+    self.assertTrue(Path("new_log.txt").exists())
+
+def tearDown(self):
+    Path("new_log.txt").unlink(missing_ok=True)
+
 
 if __name__ == "__main__":
     unittest.main()
