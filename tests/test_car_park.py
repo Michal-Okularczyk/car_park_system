@@ -1,16 +1,22 @@
 import unittest
 from pathlib import Path
-from car_park import CarPark
+import json
+from car_park import CarPark  # Ensure that CarPark is imported correctly
 
 class TestCarPark(unittest.TestCase):
+    CONFIG_FILE = "test_config.json"
     LOG_FILE = Path("test_log.txt")
 
     def setUp(self):
         self.car_park = CarPark("123 Example Street", 100, log_file=self.LOG_FILE)
 
     def tearDown(self):
+        if Path(self.CONFIG_FILE).exists():
+            Path(self.CONFIG_FILE).unlink()
+        if Path("config.json").exists():
+            Path("config.json").unlink()
         if self.LOG_FILE.exists():
-            self.LOG_FILE.unlink(missing_ok=True)
+            self.LOG_FILE.unlink()
 
     def test_car_park_initialized_with_all_attributes(self):
         self.assertIsInstance(self.car_park, CarPark)
@@ -39,7 +45,9 @@ class TestCarPark(unittest.TestCase):
         self.assertEqual(self.car_park.available_bays, 0)
         self.car_park.add_car("FAKE-100")
         self.assertEqual(self.car_park.available_bays, 0)
-        self.car_park.remove_car("FAKE-100")
+        # Attempt to add an extra car should not change the available bays
+        with self.assertRaises(ValueError):
+            self.car_park.remove_car("FAKE-100")
         self.assertEqual(self.car_park.available_bays, 0)
 
     def test_removing_a_car_that_does_not_exist(self):
@@ -69,6 +77,23 @@ class TestCarPark(unittest.TestCase):
         self.assertIn("NEW-001 exited", last_line)
         self.assertIn("\n", last_line)
 
+    def test_write_config(self):
+        self.car_park.write_config()
+        self.assertTrue(Path("config.json").exists())
+        with open("config.json") as f:
+            config = json.load(f)
+        self.assertEqual(config["location"], self.car_park.location)
+        self.assertEqual(config["capacity"], self.car_park.capacity)
+        self.assertEqual(config["log_file"], str(self.car_park.log_file))
+
+    def test_from_config(self):
+        car_park = CarPark("123 Example Street", 100, log_file=self.LOG_FILE)
+        car_park.write_config()
+        loaded_car_park = CarPark.from_config("config.json")
+        self.assertEqual(loaded_car_park.location, car_park.location)
+        self.assertEqual(loaded_car_park.capacity, car_park.capacity)
+        self.assertEqual(loaded_car_park.plates, car_park.plates)
+        self.assertEqual(loaded_car_park.log_file, car_park.log_file)
+
 if __name__ == "__main__":
     unittest.main()
-
