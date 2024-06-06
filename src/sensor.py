@@ -1,10 +1,12 @@
 # sensor.py
 
-from car_park import CarPark
 from abc import ABC, abstractmethod
 import random
 
 class Sensor(ABC):
+    def __init__(self, car_park):
+        self.car_park = car_park
+
     @abstractmethod
     def update_car_park(self, plate):
         pass
