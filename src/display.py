@@ -14,3 +14,5 @@ class Display:
         if "is_on" in data:
             self.is_on = data["is_on"]
 
+
+
