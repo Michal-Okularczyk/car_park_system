@@ -1,12 +1,18 @@
 # car_park.py
 
+from pathlib import Path
+from datetime import datetime
+
 class CarPark:
-    def __init__(self, location, capacity, plates=None, sensors=None, displays=None):
+    def __init__(self, location, capacity, plates=None, sensors=None, displays=None, log_file=Path("log.txt")):
         self.location = location
         self.capacity = capacity
-        self.plates = plates or []
-        self.sensors = sensors or []
-        self.displays = displays or []
+        self.plates = plates if plates is not None else []
+        self.sensors = sensors if sensors is not None else []
+        self.displays = displays if displays is not None else []
+        self.log_file = log_file if isinstance(log_file, Path) else Path(log_file)
+        # Create the file if it doesn't exist
+        self.log_file.touch(exist_ok=True)
 
     def __str__(self):
         return f"Car park at {self.location}, with {self.capacity} bays."
@@ -22,16 +28,16 @@ class CarPark:
             self.displays.append(component)
 
     def add_car(self, plate):
-        from display import Display  # Move the import statement here
         self.plates.append(plate)
         self.update_displays()
+        self._log_car_activity(plate, "entered")
 
     def remove_car(self, plate):
-        if plate in self.plates:
-            self.plates.remove(plate)
-            self.update_displays()
-        else:
-            raise ValueError(f"Car with plate {plate} does not exist in the car park.")
+        if plate not in self.plates:
+            raise ValueError(f"No car with plate {plate} is parked.")
+        self.plates.remove(plate)
+        self.update_displays()
+        self._log_car_activity(plate, "exited")
 
     @property
     def available_bays(self):
@@ -43,5 +49,6 @@ class CarPark:
         for display in self.displays:
             display.update(data)
 
-
-
+    def _log_car_activity(self, plate, action):
+        with self.log_file.open("a") as f:
+            f.write(f"{plate} {action} at {datetime.now():%Y-%m-%d %H:%M:%S}\n")
