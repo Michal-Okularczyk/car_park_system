@@ -1,14 +1,6 @@
 # car_park.py
 
 class CarPark:
-    pass  # Placeholder, ill add attributes and methods later
-
-# car_park.py
-
-from sensor import Sensor
-from display import Display
-
-class CarPark:
     def __init__(self, location, capacity, plates=None, sensors=None, displays=None):
         self.location = location
         self.capacity = capacity
@@ -20,6 +12,8 @@ class CarPark:
         return f"Car park at {self.location}, with {self.capacity} bays."
 
     def register(self, component):
+        from sensor import Sensor  # Move the import statement here
+        from display import Display  # Move the import statement here
         if not isinstance(component, (Sensor, Display)):
             raise TypeError("Object must be a Sensor or Display")
         if isinstance(component, Sensor):
@@ -28,6 +22,7 @@ class CarPark:
             self.displays.append(component)
 
     def add_car(self, plate):
+        from display import Display  # Move the import statement here
         self.plates.append(plate)
         self.update_displays()
 
@@ -35,12 +30,15 @@ class CarPark:
         if plate in self.plates:
             self.plates.remove(plate)
             self.update_displays()
+        else:
+            raise ValueError(f"Car with plate {plate} does not exist in the car park.")
 
     @property
     def available_bays(self):
         return max(0, self.capacity - len(self.plates))
 
     def update_displays(self):
+        from display import Display  # Move the import statement here
         data = {"available_bays": self.available_bays, "temperature": 25}  # Example data
         for display in self.displays:
             display.update(data)
