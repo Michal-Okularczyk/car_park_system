@@ -1,5 +1,3 @@
-# car_park.py
-
 from pathlib import Path
 from datetime import datetime
 
@@ -52,3 +50,4 @@ class CarPark:
     def _log_car_activity(self, plate, action):
         with self.log_file.open("a") as f:
             f.write(f"{plate} {action} at {datetime.now():%Y-%m-%d %H:%M:%S}\n")
+
