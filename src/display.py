@@ -2,7 +2,6 @@
 
 class Display:
     pass  # Placeholder, ill add attributes and methods later
-# display.py
 
 class Display:
     def __init__(self, id, message="", is_on=False, car_park=None):
@@ -13,3 +12,10 @@ class Display:
 
     def __str__(self):
         return f"Display {self.id}: {self.message}"
+
+    def update(self, available_bays):
+        self.message = f"{available_bays} bays available"
+        if self.is_on:
+            print(self)
+
+
