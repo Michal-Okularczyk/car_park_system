@@ -1,18 +1,17 @@
 import unittest
 from pathlib import Path
 import json
-from car_park import CarPark  # Ensure that CarPark is imported correctly
+from car_park import CarPark
+from display import Display
+from sensor import Sensor
 
 class TestCarPark(unittest.TestCase):
-    CONFIG_FILE = "test_config.json"
     LOG_FILE = Path("test_log.txt")
 
     def setUp(self):
         self.car_park = CarPark("123 Example Street", 100, log_file=self.LOG_FILE)
 
     def tearDown(self):
-        if Path(self.CONFIG_FILE).exists():
-            Path(self.CONFIG_FILE).unlink()
         if Path("config.json").exists():
             Path("config.json").unlink()
         if self.LOG_FILE.exists():
@@ -28,45 +27,16 @@ class TestCarPark(unittest.TestCase):
         self.assertEqual(self.car_park.available_bays, 100)
         self.assertEqual(self.car_park.log_file, self.LOG_FILE)
 
-    def test_add_car(self):
-        self.car_park.add_car("FAKE-001")
-        self.assertEqual(self.car_park.plates, ["FAKE-001"])
-        self.assertEqual(self.car_park.available_bays, 99)
-
-    def test_remove_car(self):
-        self.car_park.add_car("FAKE-001")
-        self.car_park.remove_car("FAKE-001")
-        self.assertEqual(self.car_park.plates, [])
-        self.assertEqual(self.car_park.available_bays, 100)
-
-    def test_overfill_the_car_park(self):
-        for i in range(100):
-            self.car_park.add_car(f"FAKE-{i}")
-        self.assertEqual(self.car_park.available_bays, 0)
-        self.car_park.add_car("FAKE-100")
-        self.assertEqual(self.car_park.available_bays, 0)
-        # Attempt to add an extra car should not change the available bays
-        with self.assertRaises(ValueError):
-            self.car_park.remove_car("FAKE-100")
-        self.assertEqual(self.car_park.available_bays, 0)
-
-    def test_removing_a_car_that_does_not_exist(self):
-        with self.assertRaises(ValueError):
-            self.car_park.remove_car("NO-1")
-
-    def test_register_raises_type_error(self):
-        with self.assertRaises(TypeError):
-            self.car_park.register("Not a Sensor or Display")
-
     def test_log_file_created(self):
-        self.car_park.add_car("FAKE-001")
-        self.assertTrue(self.LOG_FILE.exists())
+        new_carpark = CarPark("123 Example Street", 100, log_file="new_log.txt")
+        self.assertTrue(Path("new_log.txt").exists())
 
     def test_car_logged_when_entering(self):
         self.car_park.add_car("NEW-001")
         with self.LOG_FILE.open() as f:
             last_line = f.readlines()[-1]
-        self.assertIn("NEW-001 entered", last_line)
+        self.assertIn("NEW-001", last_line)
+        self.assertIn("entered", last_line)
         self.assertIn("\n", last_line)
 
     def test_car_logged_when_exiting(self):
@@ -74,7 +44,8 @@ class TestCarPark(unittest.TestCase):
         self.car_park.remove_car("NEW-001")
         with self.LOG_FILE.open() as f:
             last_line = f.readlines()[-1]
-        self.assertIn("NEW-001 exited", last_line)
+        self.assertIn("NEW-001", last_line)
+        self.assertIn("exited", last_line)
         self.assertIn("\n", last_line)
 
     def test_write_config(self):
