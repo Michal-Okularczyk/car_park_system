@@ -1,10 +1,10 @@
-# sensor.py
-
 from abc import ABC, abstractmethod
 import random
 
 class Sensor(ABC):
-    def __init__(self, car_park):
+    def __init__(self, sensor_id, is_active, car_park):
+        self.sensor_id = sensor_id
+        self.is_active = is_active
         self.car_park = car_park
 
     @abstractmethod
@@ -15,8 +15,9 @@ class Sensor(ABC):
         return 'FAKE-' + format(random.randint(0, 999), "03d")
 
     def detect_vehicle(self):
-        plate = self._scan_plate()
-        self.update_car_park(plate)
+        if self.is_active:
+            plate = self._scan_plate()
+            self.update_car_park(plate)
 
 class EntrySensor(Sensor):
     def update_car_park(self, plate):
@@ -30,4 +31,3 @@ class ExitSensor(Sensor):
 
     def _scan_plate(self):
         return random.choice(self.car_park.plates)
-

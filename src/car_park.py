@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 from datetime import datetime
+from sensor import Sensor  # Ensure you have this import
+from display import Display  # Ensure you have this import
 
 class CarPark:
     def __init__(self, location, capacity, log_file=Path("log.txt")):
@@ -53,5 +55,3 @@ class CarPark:
         with config_file.open() as f:
             config = json.load(f)
         return cls(config["location"], config["capacity"], log_file=Path(config["log_file"]))
-
-
