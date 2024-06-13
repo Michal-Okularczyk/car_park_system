@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 import json
-from car_park import CarPark  # Ensure that CarPark is imported correctly
+from car_park import CarPark
 
 class TestCarPark(unittest.TestCase):
     CONFIG_FILE = "test_config.json"
